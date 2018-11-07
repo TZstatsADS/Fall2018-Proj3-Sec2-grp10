@@ -31,7 +31,7 @@ Set the working directory to the image folder. Specify the training and the test
 
 ```{r wkdir, eval=FALSE}
 set.seed(2018)
-setwd("C:/Users/zhang/OneDrive/Courseworks/GR5243/Fall2018_Proj3_Sec2/doc")
+setwd("C:/Users/zhang/OneDrive/Courseworks/GR5243/Fall2018-Proj3-Sec2--sec2proj3_grp10/doc")
 # here replace it with your own path or manually set it in RStudio to where this rmd file is located. 
 # use relative path for reproducibility
 ```
@@ -175,7 +175,7 @@ if(run.feature.train){
   feat_train <- dat_train$feature
   label_train <- dat_train$label
 }
-save.image(file="../output/feature_train.RData")
+# save.image(file="../output/feature_train.RData")
 dim(feat_train)
 dim(label_train)
 ```
@@ -484,6 +484,7 @@ superResolution <- function(LR_dir, HR_dir, modelList){
 }
 
 tm_test=NA
+run.test=TRUE # run evaluation on an independent test set
 if(run.test){
   load(file="../output/fit_train_xgboost.RData")
   tm_test <- system.time(superResolution(test_LR_dir, test_HR_dir, fit_train))
