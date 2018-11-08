@@ -12,7 +12,7 @@ Term: Fall 2018
 	+ Qingyang Zhong
 	+ Rui Zhang
 
-+ Project summary: In this project, we created a classification engine for enhance the resolution of images. We use one GBM baseline model and 3 improvement method to achieve this goal.
++ Project summary: In this project, we created a classification engine for enhance the resolution of images. We use one GBM baseline model, XGboost and Random Forest model to achieve this goal. And we also use more neighbors to extract the features to improve our baseline model. Finally we choose 24 neighbors feature extracting and XGboost model to predict the high resolution pircture from low resolution pictures.
 
 	
 **Contribution statement**: 
