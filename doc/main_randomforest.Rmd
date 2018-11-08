@@ -1,0 +1,203 @@
+---
+title: "Project 3 - Main Script for Random Forest"
+author: "Qingyang Zhong"
+output: html_notebook
+---
+
+#Step 0: Preparation
+Install Required packages.
+```{r pacg,message=FALSE,warning=FALSE}
+if(!require("EBImage")){
+  source("https://bioconductor.org/biocLite.R")
+  biocLite("EBImage")
+}
+
+if(!require("randomForest")){
+  install.packages("randomForest")
+}
+
+library("EBImage")
+library("randomForest")
+```
+
+Specify directories.
+
+Set the working directory to the image folder. In order to obain reproducible results, set.seed() whenever randomization is used. 
+```{r wkdir, eval=FALSE,message=FALSE,warning=FALSE}
+# here replace it with your own path or manually set it in RStudio to where this rmd file is located. 
+# use relative path for reproducibility
+set.seed(8)
+path<-setwd("~/Documents/GitHub/Fall2018-Proj3-Sec2--sec2proj3_grp10")
+```
+
+Provide directories for training images. 
+
+Low-resolution (LR) image set and High-resolution (HR) image set will be in different subfolders.
+```{r train dir}
+train_dir <- "../data/train_set/" 
+train_LR_dir <- paste(train_dir, "LR/", sep="")
+train_HR_dir <- paste(train_dir, "HR/", sep="")
+train_label_path <- paste(train_dir, "label.csv", sep="") 
+```
+
+
+### Step 1: set up controls for evaluation experiments.
+
+In this chunk, we have a set of controls for the evaluation experiments. 
+
++ (T/F) cross-validation on the training set
++ (number) K, the number of CV folds
++ (T/F) process features for training set
++ (T/F) run evaluation on an independent test set
++ (T/F) process features for test set
+```{r exp_setup}
+run.cv=TRUE # run cross-validation on the training set
+K <- 10  # number of CV folds
+run.feature.train=TRUE # process features for training set
+run.test=TRUE # run evaluation on an independent test set
+run.feature.test=TRUE # process features for test set
+```
+
+Potential parameter to be tuned.
+
+Using cross-validation or independent test set evaluation, we compare the performance of models with different specifications. In this example, we use RandomForest with different `mtry` and `ntrees`. 
+
+In the following chunk, we list, in a vector, setups (in this case, `mtry`,`ntrees`) corresponding to models that we will compare. 
+```{r model_setup}
+model_values1 <- seq(3, 7, 2)
+model_values2 <- seq(300,700,200)
+  
+model_labels1 = paste("Randomforest with mtry =", model_values1)
+model_labels2 = paste("Randomforest with ntrees =", model_values2)
+```
+
+
+### Step 2: import training images class labels.
+
+```{r train_label}
+extra_label <- read.csv(train_label_path, colClasses=c("NULL", NA, NA))
+```
+
+### Step 3: construct features and responses
+
+`feature_randomforest.R` should be the wrapper for all your feature engineering functions and options. The function `feature( )` should have options that correspond to different scenarios for your project and produces an R object that contains features and responses that are required by all the models you are going to evaluate later. 
++ `feature_randomforest.R`
+  + Input: a path for low-resolution images.
+  + Input: a path for high-resolution images.
+  + Output: an RData file that contains extracted features and corresponding responses
+
+```{r feature}
+source("../lib/feature_randomforest.R")
+
+tm_feature_train <- NA
+if(run.feature.train){
+  tm_feature_train <- system.time(dat_train <- feature_randomforest(train_LR_dir, train_HR_dir))
+  feat_train <- dat_train$feature
+  label_train <- dat_train$label
+}
+save(dat_train, file="../output/feature_train_randomforest.RData")
+```
+
+
+### Step 4: Train a classification model with training images
+Call the train model and test model from library. 
+
+`train_randomforest.R` and `test_randomforest.R` should be wrappers for all your model training steps and your classification/prediction steps. 
+
++ `train_randomforest.R`
+  + Input: a path that points to the training set features and responses.
+  + Output: an RData file that contains trained classifiers in the forms of R objects: models/settings/links to external trained configurations.
+  
++ `test_randomforest.R`
+  + Input: a path that points to the test set features.
+  + Input: an R object that contains a trained classifier.
+  + Output: an R object of response predictions on the test set. If there are multiple classifiers under evaluation, there should be multiple sets of label predictions. 
+```{r loadlib}
+source("../lib/train_randomforest.R")
+source("../lib/test_randomforest.R")
+```
+
+
+#### Model selection with cross-validation
+Do model selection by choosing among different values of training model parameters.
+```{r runcv, message=FALSE, warning=FALSE}
+source("../lib/cross_validation_randomforest.R")
+if(run.cv){
+  err_cv <- array(dim=c(length(model_values1)*length(model_values2), 2))
+  for(k1 in 1:length(model_values1)){
+    for(k2 in 1:length(model_values2)){ 
+    cat("k1=", k1, ",k2=", k2, "\n")
+    index <- (k1-1)*length(model_values2) + k2 
+    err_cv[index,] <- cv.function(feat_train, label_train, model_values1[k1], model_values2[k2], K)
+    }
+  }
+  save(err_cv, file="../output/err_cv_randomforest.RData")
+}
+```
+
+
+Visualize cross-validation results. 
+```{r cv_vis}
+if(run.cv){
+ load("../output/err_cv_randomforest.RData")
+ err_cv  <- data.frame(err_cv_randomforest)
+ colnames(err_cv) <- c("cv_mean","cv_sd")
+ par_mix <- expand.grid(model_values1, model_values2)
+
+ colnames(par_mix) <- c("K1","K2")
+ par_mix <- par_mix[order(par_mix$K1),]
+ err_cv  <- cbind(err_cv, par_mix)
+ 
+ plot(err_cv[,"K1"], err_cv[,1], xlab="model value of mtrys", ylab="CV Error",
+       main="Cross Validation Error", type="n", ylim=c(0.002, 0.004))
+ points(err_cv[,"K1"], err_cv[,1], col="blue", pch=16)
+ lines(err_cv[,"K1"], err_cv[,1], col="blue")
+ arrows(err_cv[,"K1"], err_cv[,1]-err_cv[,2], err_cv[,"K1"], err_cv[,1]+err_cv[,2], 
+        length=0.1, angle=90, code=3)
+
+ 
+ plot(err_cv[,"K2"], err_cv[,1], xlab="model value of ntrees", ylab="CV Error",
+       main="Cross Validation Error", type="n", ylim=c(0.002, 0.004))
+ points(err_cv[,"K2"], err_cv[,1], col="blue", pch=16)
+ lines(err_cv[,"K2"], err_cv[,1], col="blue")
+ arrows(err_cv[,"K2"], err_cv[,1]-err_cv[,2], err_cv[,"K2"], err_cv[,1]+err_cv[,2], 
+        length=0.1, angle=90, code=3)
+}
+```
+
+Choose the "best"" parameter value
+```{r best_model}
+model_best <- NULL 
+if(run.cv){
+  model_best <- err_cv[which.min(err_cv[,1]),]
+}
+par_best <- list(mtry = model_best$K1, ntrees = model_best$K2)
+```
+
+Train the model with the entire training set using the selected model (model parameter) via cross-validation.
+```{r final_train}
+tm_train=NA
+tm_train <- system.time(fit_train <- train_randomforest(feat_train, label_train, par_best))
+save(fit_train, file="../output/fit_train_randomforest.RData")
+```
+
+
+### Step 5: Super-resolution for test images
+Feed the final training model with the completely holdout testing data. 
++ `superResolution_randomforest.R`
+  + Input: a path that points to the folder of low-resolution test images.
+  + Input: a path that points to the folder (empty) of high-resolution test images.
+  + Input: an R object that contains tuned predictors.
+  + Output: construct high-resolution versions for each low-resolution test image.
+```{r superresolution}
+source("../lib/superResolution_randomforest.R")
+test_dir <- "../data/test_set/" # This will be modified for different data sets.
+test_LR_dir <- paste(test_dir, "LR/", sep="")
+test_HR_dir <- paste(test_dir, "HR/", sep="")
+tm_test=NA
+if(run.test){
+  load(file="../output/fit_train_randomforest.RData")
+  tm_test <- system.time(superResolution_randomforest(test_LR_dir, test_HR_dir, fit_train))
+}
+```
+
