@@ -18,7 +18,9 @@ Term: Fall 2018
 **Contribution statement**: 
 
 Peilu Zhang: " I write all the baseline code, including feature.R and superresolution.R for all the models and small changes in test.R and train.R. I shortened the feature extracting time of 1500 pictures to 3 mins, tuned the gbm parameter by cross validation. And I fixed the code of xgboost model." 
+
 Rui Zhang:"I'm responsible for improving the model using XGBoost algorithm and I tuned the parameters by cross validation. I also need to compare all the possible improvement methods on theoretical level. And I summarized the performance measure indicators regarding accuracy, memory and speed."
+
 Chun Zhai: “I am responsible for the improved feature part of the project. This includes writing codes for 24 neighbors feature and testing it on both GBM baseline model and XGBoost model, tunning the parameters through cross validation. I also write codes in Python for SIFT key points detection method and try other feature improving methods like padding other constant and adding diagonal neighbours."
 
 
