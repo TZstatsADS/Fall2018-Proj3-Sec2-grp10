@@ -16,6 +16,7 @@ Term: Fall 2018
 
 	
 **Contribution statement**: 
+
 Peilu Zhang: " I write all the baseline code, including feature.R and superresolution.R for all the models and small changes in test.R and train.R. I shortened the feature extracting time of 1500 pictures to 3 mins, tuned the gbm parameter by cross validation. And I fixed the code of xgboost model."
 
 
