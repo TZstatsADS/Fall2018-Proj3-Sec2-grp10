@@ -8,7 +8,7 @@ Term: Fall 2018
 + Team #
 + Team members
 	+ Peilu Zhang(pz2233@columnia.edu)
-	+ Chun Zhai （）
+	+ Chun Zhai(cz2466@columbia.edu）
 	+ Qingyang Zhong
 	+ Rui Zhang(rz2394@columbia.edu)
 
