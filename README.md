@@ -8,11 +8,11 @@ Term: Fall 2018
 + Team #
 + Team members
 	+ Peilu Zhang(pz2233@columnia.edu)
-	+ Chun Zhai
+	+ Chun Zhai （）
 	+ Qingyang Zhong
 	+ Rui Zhang(rz2394@columbia.edu)
 
-+ Project summary: In this project, we created a classification engine for enhance the resolution of images. We used one GBM baseline model, XGboost and Random Forest model to achieve this goal. And we also use more neighbors to extract the features to improve our baseline model. Finally we choose 24 neighbors feature extracting and XGboost model to predict the high resolution pircture from low resolution pictures.
++ Project summary: In this project, we created a classification engine for enhance the resolution of images. We used one GBM baseline model, XGboost and Random Forest model to achieve this goal. And we also use more neighbors to extract the features to improve our baseline model. Finally we choose 8 neighbors feature extracting and XGboost model to predict the high resolution pircture from low resolution pictures.
 
 	
 **Contribution statement**: 
