@@ -7,15 +7,17 @@ Term: Fall 2018
 
 + Team #
 + Team members
-	+ team member 1
-	+ team member 2
-	+ team member 3
-	+ team member 4
-	+ team member 5
+	+ Peilu Zhang(pz2233@columnia.edu)
+	+ Chun Zhai
+	+ Qingyang Zhong
+	+ Rui Zhang
 
-+ Project summary: In this project, we created a classification engine for enhance the resolution of images. 
++ Project summary: In this project, we created a classification engine for enhance the resolution of images. We use one GBM baseline model and 3 improvement method to achieve this goal.
+
 	
-**Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
+**Contribution statement**: 
+Peilu Zhang: " I write all the baseline code, including feature.R and superresolution.R for all the models and small changes in test.R and train.R. I shortened the feature extracting time of 1500 pictures to 3 mins, tuned the gbm parameter by cross validation. And I fixed the code of xgboost model."
+
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
